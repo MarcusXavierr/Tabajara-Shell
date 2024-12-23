@@ -1,0 +1,132 @@
+#include "core.h"
+#include <stdlib.h>
+#include "parser.h"
+#include "helper.h"
+#include "job.h"
+#include <string.h>
+#include <stdio.h>
+
+/*
+ * If the user has typed a built-in command then execute
+ *    it immediately.
+ */
+int builtin_cmd(char **argv);
+
+void run_command(char **argv, char *cmdline, int bg);
+
+void do_bg(char **argv);
+
+void do_fg(char **argv);
+
+void waitfg(pid_t pid);
+
+void eval(char *cmdline) {
+    char **argv = (char **)malloc(MAXARGS * sizeof(char *));
+    for (int i = 0; i < MAXARGS; i++)
+        argv[i] = (char *)malloc(100 * sizeof(char));
+
+    int bg = parseline(cmdline, argv);
+
+    if (argv == NULL) {
+        app_error("wtf is happening");
+        return;
+    }
+
+    if (builtin_cmd(argv) == 1) {
+        return;
+    }
+
+    run_command(argv, cmdline, bg);
+}
+
+int builtin_cmd(char **argv) {
+    if (strcmp(argv[0], "quit") == 0) {
+        exit(0);
+        return 1;
+    }
+    if (strcmp(argv[0], "jobs") == 0) {
+        listjobs(jobs);
+        return 1;
+    }
+
+    if (strcmp(argv[0], "bg") == 0) {
+        do_bg(argv);
+        return 1;
+    }
+
+    if (strcmp(argv[0], "fg") == 0) {
+        do_fg(argv);
+        return 1;
+    }
+
+    return 0; /* not a builtin command */
+}
+
+void run_command(char **argv, char *cmdline, int bg) {
+    pid_t pid;
+    if ((pid = Fork()) == 0) {
+        // INFO: Set a different program group ID for the fork child
+        setpgid(0, 0);
+        Execve(argv[0], argv, NULL);
+    } else {
+        addjob(jobs, pid, bg ? BG : FG, cmdline);
+        if (bg) {
+            printf("[%d] (%d) %s\n", maxjid(jobs), pid, cmdline);
+        } else {
+            waitfg(pid);
+        }
+    }
+}
+
+/*
+ * do_bg - Execute the builtin bg and fg commands
+ */
+void do_bg(char **argv) {
+    struct job_t *job = parse_job_index(argv);
+    if (job == NULL) {
+        return;
+    }
+
+    killpg(job->pid, SIGCONT);
+    job->state = BG;
+    return;
+}
+
+/*
+ * do_fg - Execute the builtin bg and fg commands
+ */
+void do_fg(char **argv) {
+    struct job_t *job = parse_job_index(argv);
+    if (job == NULL) {
+        return;
+    }
+
+    killpg(job->pid, SIGCONT);
+    job->state = FG;
+    waitfg(job->pid);
+    return;
+}
+
+/*
+ * waitfg - Block until process pid is no longer the foreground process
+ */
+void waitfg(pid_t pid) {
+    int child_status;
+    Waitpid(pid, &child_status, WUNTRACED);
+
+    if (WIFSTOPPED(child_status)) {
+        struct job_t *job = getjobpid(jobs, pid);
+        job->state = ST;
+        printf("Job [%d] (%d) stopped by signal 20\n", pid2jid(pid), pid);
+        return;
+    } else if (WIFSIGNALED(child_status) && WTERMSIG(child_status) == SIGINT) {
+        printf("Job [%d] (%d) terminated by signal 2\n", pid2jid(pid), pid);
+    }
+
+    if (verbose) {
+        printf("Process (%d) no longer the fg process\n", pid);
+    }
+
+    deletejob(jobs, pid);
+    return;
+}
