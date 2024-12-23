@@ -1,6 +1,19 @@
 # Tabajara Shell
 This is just a simple shell created for educational purposes. The code is implemented in C and it's pretty straightforward.
 
+## Examples
+Running simple commands on shell
+
+https://github.com/user-attachments/assets/bea7f725-3b0d-4d78-a2ec-b3c97f441371
+
+
+Running the command that generated the video above on the Tabajara Shell 🤯
+
+https://github.com/user-attachments/assets/a31d371e-d2bd-4587-9210-a3abec216b79
+
+
+
+
 ## Compiling the shell
 To compile the project, you just need a C compiler and the `make` utility.
 
