@@ -6,6 +6,9 @@
 #include <string.h>
 #include <stdio.h>
 
+
+extern char **environ;   /* defined in libc */
+
 /*
  * If the user has typed a built-in command then execute
  *    it immediately.
@@ -67,7 +70,7 @@ void run_command(char **argv, char *cmdline, int bg) {
     if ((pid = Fork()) == 0) {
         // INFO: Set a different program group ID for the fork child
         setpgid(0, 0);
-        Execve(argv[0], argv, NULL);
+        Execve(argv[0], argv, environ);
     } else {
         addjob(jobs, pid, bg ? BG : FG, cmdline);
         if (bg) {
