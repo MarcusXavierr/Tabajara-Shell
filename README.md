@@ -12,6 +12,9 @@ Running the command that generated the video above on the Tabajara Shell 🤯
 https://github.com/user-attachments/assets/a31d371e-d2bd-4587-9210-a3abec216b79
 
 
+Writing a commit inside TSH 😎
+
+https://github.com/user-attachments/assets/e40afaa0-ee0d-4b93-aebb-46506561cdee
 
 
 ## Compiling the shell
