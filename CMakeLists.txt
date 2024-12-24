@@ -19,7 +19,7 @@ if(BUILD_TESTS)
     add_library(unity STATIC external/unity/unity.c)
     add_library(src STATIC ${SOURCES} ${HEADERS})
 
-    add_subdirectory(tests)
+    add_subdirectory(test)
 
     add_custom_target(test
       COMMENT "Running all tests..."
@@ -27,7 +27,7 @@ if(BUILD_TESTS)
     )
 
     # Busca todos os alvos de teste adicionados e os inclui no target customizado de teste
-    get_directory_property(TestTargets DIRECTORY tests BUILDSYSTEM_TARGETS)
+    get_directory_property(TestTargets DIRECTORY test BUILDSYSTEM_TARGETS)
     foreach(Target ${TestTargets})
       # Garante que cada teste seja construído antes de ser executado no target customizado
       add_dependencies(test ${Target})
