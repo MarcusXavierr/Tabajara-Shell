@@ -4,17 +4,26 @@ This is just a simple shell created for educational purposes. The code is implem
 ## Examples
 Running simple commands on shell
 
-https://github.com/user-attachments/assets/bea7f725-3b0d-4d78-a2ec-b3c97f441371
+
+https://github.com/user-attachments/assets/c059bab1-58a2-48ef-97c3-b29d14667765
+
+
+
 
 
 Running the command that generated the video above on the Tabajara Shell 🤯
 
-https://github.com/user-attachments/assets/a31d371e-d2bd-4587-9210-a3abec216b79
+https://github.com/user-attachments/assets/5d1c597a-981f-4d5e-9289-451ecc1fa94a
+
+
+
 
 
 Writing a commit inside TSH 😎
 
-https://github.com/user-attachments/assets/e40afaa0-ee0d-4b93-aebb-46506561cdee
+https://github.com/user-attachments/assets/a3ddb288-c602-4603-a545-cb46c737a2bb
+
+
 
 
 ## Compiling the shell
@@ -44,12 +53,12 @@ fg %job_id OR fg PID
 bg %job_id OR bg PID
 jobs
 ```
-You can also run other executables specifying the full path to the executable (I'll add short path support later):
+You can also run other executables:
 
 ```bash
-/bin/ls
-/bin/cat /etc/passwd
-/bin/echo "Hello World!"
+ls
+cat /etc/passwd
+echo "Hello World!"
 ./tsh
 ```
 
