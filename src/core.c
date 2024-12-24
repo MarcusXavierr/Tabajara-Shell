@@ -23,6 +23,8 @@ void do_fg(char **argv);
 
 void waitfg(pid_t pid);
 
+int find_on_path(char **argv);
+
 void eval(char *cmdline) {
     char **argv = (char **)malloc(MAXARGS * sizeof(char *));
     for (int i = 0; i < MAXARGS; i++)
@@ -69,6 +71,7 @@ void run_command(char **argv, char *cmdline, int bg) {
     pid_t pid;
     if ((pid = Fork()) == 0) {
         // INFO: Set a different program group ID for the fork child
+        find_on_path(argv);
         setpgid(0, 0);
         Execve(argv[0], argv, environ);
     } else {
@@ -132,4 +135,16 @@ void waitfg(pid_t pid) {
 
     deletejob(jobs, pid);
     return;
+}
+
+int find_on_path(char **argv) {
+    char *path = getenv("PATH");
+    int counter = 0;
+    char *value = find_valid_program_path(parse_path(&counter, path), counter, argv[0]);
+    if (value != NULL) {
+        argv[0] = value;
+        return 1;
+    }
+
+    return 0;
 }
