@@ -29,4 +29,8 @@ void Execve(const char *filename, char *const argv[], char *const envp[]);
 
 // TODO: add comment
 int valid_id(char *id);
+
+char **parse_path(int *counter, char* path);
+
+char *find_valid_program_path(char **paths, int num_paths, char *program);
 #endif

@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+
+extern char **environ;   /* defined in libc */
 
 void unix_error(char *msg) {
     fprintf(stdout, "%s: %s\n", msg, strerror(errno));
@@ -68,4 +71,55 @@ int valid_id(char *id) {
     }
 
     return 1;
+}
+
+char **parse_path(int *counter, char* path) {
+    if (path == NULL) {
+        *counter = 0;
+        return NULL;
+    }
+
+    *counter = 1;
+    char *pointer = path;
+    char *copy = calloc(sizeof(char), strlen(path) + 1);
+    strcpy(copy, path);
+    // Just counting how many separated items there are on the PATH
+    while(*pointer != '\0') {
+        if (*pointer++ == ':')
+            (*counter)++;
+    }
+
+    char **tokens = malloc(sizeof(char*) * *counter);
+
+    char delim[2] = ":";
+    char *token = strtok(copy, delim);
+
+    for (int i = 0; token != NULL && i < *counter; i++) {
+        tokens[i] = token;
+        token = strtok(NULL, ":");
+    }
+
+    return tokens;
+}
+
+void Stat(const char *filename, struct stat *buf)
+{
+    if (stat(filename, buf) < 0)
+	unix_error("Stat error");
+}
+
+char *find_valid_program_path(char **paths, int num_paths, char *program) {
+    for (int i = 0; i < num_paths; i++) {
+        char *path = paths[i];
+        char *buffer = calloc(sizeof(char), (strlen(path) + strlen(program) + 1));
+        sprintf(buffer, "%s/%s", path, program);
+        struct stat st;
+        int status = stat(buffer, &st);
+        if (status == 0 && st.st_mode & S_IXUSR) {
+            return buffer;
+        };
+        free(buffer);
+    }
+
+    return NULL;
 }
