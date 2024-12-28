@@ -1,13 +1,12 @@
 #include "core.h"
-#include <stdlib.h>
-#include "parser.h"
 #include "helper.h"
 #include "job.h"
-#include <string.h>
+#include "parser.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-
-extern char **environ;   /* defined in libc */
+extern char **environ; /* defined in libc */
 
 /*
  * If the user has typed a built-in command then execute
@@ -24,6 +23,8 @@ void do_fg(char **argv);
 void waitfg(pid_t pid);
 
 int find_on_path(char **argv);
+
+int do_cd(char **args);
 
 void eval(char *cmdline) {
     char **argv = (char **)malloc(MAXARGS * sizeof(char *));
@@ -61,6 +62,11 @@ int builtin_cmd(char **argv) {
 
     if (strcmp(argv[0], "fg") == 0) {
         do_fg(argv);
+        return 1;
+    }
+
+    if (strcmp(argv[0], "cd") == 0) {
+        do_cd(argv);
         return 1;
     }
 
@@ -135,6 +141,17 @@ void waitfg(pid_t pid) {
 
     deletejob(jobs, pid);
     return;
+}
+
+int do_cd(char **args) {
+    if (args[1] == NULL) {
+        fprintf(stderr, "lsh: expected argument to \"cd\"\n");
+    } else {
+        if (chdir(args[1]) != 0) {
+            perror("lsh");
+        }
+    }
+    return 1;
 }
 
 int find_on_path(char **argv) {
