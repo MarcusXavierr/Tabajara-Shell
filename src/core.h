@@ -16,18 +16,4 @@
  * when we type ctrl-c (ctrl-z) at the keyboard.
  */
 void eval(char *cmdline);
-//
-// /*
-//  * If the user has typed a built-in command then execute
-//  *    it immediately.
-//  */
-// int builtin_cmd(char **argv);
-//
-// void run_command(char **argv, char *cmdline, int bg);
-//
-// void do_bg(char **argv);
-//
-// void do_fg(char **argv);
-//
-// void waitfg(pid_t pid);
 #endif
